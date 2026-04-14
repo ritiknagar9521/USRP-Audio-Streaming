@@ -4,14 +4,31 @@
 clear; clc;
 
 %% 1. SYSTEM PARAMETERS
-centerFreq = 915e6;         
+centerFreq = 866e6;         
 sps = 8;                    
 symbolRate = 100e3;         
 sdrSampleRate = symbolRate * sps; 
 
 %% 2. READ, RESAMPLE, AND DIGITIZE AUDIO
 disp('1. Processing Audio...');
-[audioIn, audioFs] = audioread('sample2.mp3');
+
+% Create an infinite loop that forces you to provide a valid file
+validFile = false;
+while ~validFile
+    % The 's' tells MATLAB to treat your input as a raw string of text
+    fileName = input('Enter the audio file name (e.g., sample.mp3): ', 's');
+    
+    % Check if the file actually exists on your hard drive
+    if isfile(fileName)
+        validFile = true; % Break the loop
+    else
+        % Yell at the user and make them try again
+        disp(['[!] ERROR: Cannot find "', fileName, '". Check your spelling and try again.']);
+    end
+end
+
+% Read the validated file
+[audioIn, audioFs] = audioread(fileName);
 audioIn = audioIn(:,1); % Force mono
 targetAudioFs = 8000; 
 audioResampled = resample(audioIn, targetAudioFs, audioFs);
@@ -58,7 +75,7 @@ disp('Broadcasting continuously... Press Ctrl+C to stop.');
 frameSize = 4096;
 
 % FIXED: Real receivers need continuous transmission to lock
-for repeats = 1:3 
+for repeats = 1:5 
     for i = 1:frameSize:(length(txWaveform) - frameSize)
         tx(txWaveform(i:i+frameSize-1));
     end
