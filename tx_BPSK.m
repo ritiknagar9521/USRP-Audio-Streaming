@@ -58,8 +58,11 @@ disp('Broadcasting continuously... Press Ctrl+C to stop.');
 frameSize = 4096;
 
 % FIXED: Real receivers need continuous transmission to lock
-while true 
+for repeats = 1:3 
     for i = 1:frameSize:(length(txWaveform) - frameSize)
         tx(txWaveform(i:i+frameSize-1));
     end
 end
+
+release(tx);
+disp('Transmission Complete.');
